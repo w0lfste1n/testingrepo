@@ -1,9 +1,3 @@
-const currency = new Intl.NumberFormat("ru-RU", {
-  style: "currency",
-  currency: "KZT",
-  maximumFractionDigits: 0,
-});
-
 const integer = new Intl.NumberFormat("ru-RU");
 let chart;
 
@@ -11,9 +5,47 @@ function renderStat(id, value) {
   document.getElementById(id).textContent = value;
 }
 
+function formatMoney(value) {
+  return `${integer.format(Math.round(value))} ₸`;
+}
+
 function renderBarWidth(value, maxValue) {
   if (!maxValue) return 0;
   return Math.max(8, Math.round((value / maxValue) * 100));
+}
+
+function formatShortDate(value) {
+  return new Date(value).toLocaleDateString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+  });
+}
+
+function condenseDaily(daily) {
+  if (daily.length <= 14) {
+    return daily.map((item) => ({
+      label: formatShortDate(item.date),
+      orders: item.orders,
+      revenue: item.revenue,
+    }));
+  }
+
+  const bucketSize = Math.ceil(daily.length / 10);
+  const buckets = [];
+
+  for (let index = 0; index < daily.length; index += bucketSize) {
+    const chunk = daily.slice(index, index + bucketSize);
+    const first = chunk[0];
+    const last = chunk[chunk.length - 1];
+
+    buckets.push({
+      label: `${formatShortDate(first.date)} - ${formatShortDate(last.date)}`,
+      orders: chunk.reduce((sum, item) => sum + item.orders, 0),
+      revenue: chunk.reduce((sum, item) => sum + item.revenue, 0),
+    });
+  }
+
+  return buckets;
 }
 
 function renderTable(targetId, rows, labelKey) {
@@ -37,7 +69,7 @@ function renderTable(targetId, rows, labelKey) {
               <div class="table-bar-fill" style="width: ${renderBarWidth(row.revenue, maxRevenue)}%"></div>
             </div>
           </div>
-          <div class="table-value">${currency.format(row.revenue)}</div>
+          <div class="table-value">${formatMoney(row.revenue)}</div>
         </div>
       `,
     )
@@ -47,28 +79,36 @@ function renderTable(targetId, rows, labelKey) {
 function renderChart(daily) {
   const ctx = document.getElementById("ordersChart");
   if (chart) chart.destroy();
+  const series = condenseDaily(daily);
 
   chart = new Chart(ctx, {
-    type: "bar",
+    type: "line",
     data: {
-      labels: daily.map((item) => item.date),
+      labels: series.map((item) => item.label),
       datasets: [
         {
-          type: "bar",
+          type: "line",
           label: "Заказы",
-          data: daily.map((item) => item.orders),
-          borderRadius: 10,
-          backgroundColor: "#8ca6ff",
+          data: series.map((item) => item.orders),
+          borderColor: "#a5b8ff",
+          backgroundColor: "rgba(165, 184, 255, 0.16)",
           yAxisID: "y",
-          maxBarThickness: 28,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          tension: 0.35,
+          fill: true,
         },
         {
           type: "line",
           label: "Выручка",
-          data: daily.map((item) => item.revenue),
+          data: series.map((item) => item.revenue),
           borderColor: "#5f82ff",
-          backgroundColor: "rgba(95,130,255,0.12)",
-          tension: 0.32,
+          backgroundColor: "rgba(95, 130, 255, 0.18)",
+          pointBackgroundColor: "#5f82ff",
+          pointBorderWidth: 0,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          tension: 0.28,
           fill: true,
           yAxisID: "y1",
         },
@@ -83,7 +123,7 @@ function renderChart(daily) {
           callbacks: {
             label(context) {
               if (context.dataset.label === "Выручка") {
-                return `Выручка: ${currency.format(context.parsed.y)}`;
+                return `Выручка: ${formatMoney(context.parsed.y)}`;
               }
               return `Заказы: ${integer.format(context.parsed.y)}`;
             },
@@ -95,9 +135,10 @@ function renderChart(daily) {
           ticks: {
             maxRotation: 0,
             autoSkip: true,
-            maxTicksLimit: 8,
+            maxTicksLimit: 6,
           },
           grid: { display: false },
+          border: { display: false },
         },
         y: {
           beginAtZero: true,
@@ -105,14 +146,16 @@ function renderChart(daily) {
           ticks: {
             precision: 0,
           },
+          border: { display: false },
         },
         y1: {
           beginAtZero: true,
           position: "right",
           grid: { display: false },
           ticks: {
-            callback: (value) => `${Math.round(value / 1000)}k ₸`,
+            callback: (value) => formatMoney(value),
           },
+          border: { display: false },
         },
       },
     },
@@ -128,10 +171,10 @@ async function loadDashboard() {
     const payload = await response.json();
 
     renderStat("totalOrders", integer.format(payload.summary.total_orders));
-    renderStat("totalRevenue", currency.format(payload.summary.total_revenue));
-    renderStat("avgOrderValue", currency.format(payload.summary.average_order_value));
+    renderStat("totalRevenue", formatMoney(payload.summary.total_revenue));
+    renderStat("avgOrderValue", formatMoney(payload.summary.average_order_value));
     renderStat("largeOrders", integer.format(payload.summary.large_orders));
-    renderStat("thresholdValue", currency.format(payload.summary.threshold));
+    renderStat("thresholdValue", formatMoney(payload.summary.threshold));
 
     renderChart(payload.daily);
     renderTable("citiesTable", payload.top_cities, "city");
