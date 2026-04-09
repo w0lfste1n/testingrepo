@@ -3,7 +3,7 @@
   "crons": [
     {
       "path": "/api/cron_notify",
-      "schedule": "*/10 * * * *"
+      "schedule": "0 9 * * *"
     }
   ],
   "headers": [
@@ -18,3 +18,4 @@
     }
   ]
 }
+
