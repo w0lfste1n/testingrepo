@@ -14,40 +14,45 @@
   <body>
     <div class="page-shell">
       <header class="hero">
-        <div>
+        <div class="hero-copy-block">
           <p class="eyebrow">RetailCRM → Supabase → Vercel</p>
-          <h1>Mini-dashboard заказов</h1>
+          <h1>Мини-дашборд заказов</h1>
           <p class="hero-copy">
-            Данные синхронизируются из RetailCRM в Supabase, а витрина и cron-уведомления работают на Vercel.
+            Чистая витрина по заказам: сводка по выручке, динамика по дням и основные источники роста.
           </p>
         </div>
-        <div class="hero-badge">
-          <span>Large order alert</span>
+        <div class="hero-badge neumorph">
+          <span class="hero-badge-label">Порог уведомления</span>
           <strong id="thresholdValue">50 000 ₸</strong>
+          <p>Telegram-алерт уходит только по заказам выше лимита.</p>
         </div>
       </header>
 
       <main class="layout">
         <section class="stats-grid" id="statsGrid">
-          <article class="stat-card">
-            <span>Заказы</span>
+          <article class="stat-card neumorph">
+            <span class="stat-label">Заказы</span>
             <strong id="totalOrders">...</strong>
+            <p class="stat-note">Количество синхронизированных заказов</p>
           </article>
-          <article class="stat-card">
-            <span>Выручка</span>
+          <article class="stat-card neumorph">
+            <span class="stat-label">Выручка</span>
             <strong id="totalRevenue">...</strong>
+            <p class="stat-note">Сумма заказов из Supabase</p>
           </article>
-          <article class="stat-card">
-            <span>Средний чек</span>
+          <article class="stat-card neumorph">
+            <span class="stat-label">Средний чек</span>
             <strong id="avgOrderValue">...</strong>
+            <p class="stat-note">Средняя сумма заказа</p>
           </article>
-          <article class="stat-card accent">
-            <span>Крупные заказы</span>
+          <article class="stat-card stat-card-accent neumorph">
+            <span class="stat-label">Крупные заказы</span>
             <strong id="largeOrders">...</strong>
+            <p class="stat-note">Выше заданного порога уведомления</p>
           </article>
         </section>
 
-        <section class="panel chart-panel">
+        <section class="panel chart-panel neumorph">
           <div class="panel-head">
             <div>
               <p class="panel-kicker">Динамика</p>
@@ -55,10 +60,26 @@
             </div>
             <p class="panel-note" id="generatedAt">Обновление...</p>
           </div>
-          <canvas id="ordersChart" height="110"></canvas>
+          <div class="chart-grid">
+            <div class="chart-wrap">
+              <canvas id="ordersChart"></canvas>
+            </div>
+            <aside class="chart-aside">
+              <div class="aside-card">
+                <span>Фокус</span>
+                <strong>Дневная активность</strong>
+                <p>Столбцы показывают число заказов, линия — выручку по каждому дню.</p>
+              </div>
+              <div class="aside-card">
+                <span>Проверка</span>
+                <strong>Без переполнения</strong>
+                <p>Карточки и таблицы ограничены по ширине, длинные значения не ломают сетку.</p>
+              </div>
+            </aside>
+          </div>
         </section>
 
-        <section class="panel table-panel">
+        <section class="panel table-panel neumorph">
           <div class="panel-head">
             <div>
               <p class="panel-kicker">Города</p>
@@ -68,11 +89,11 @@
           <div id="citiesTable" class="table-list"></div>
         </section>
 
-        <section class="panel table-panel">
+        <section class="panel table-panel neumorph">
           <div class="panel-head">
             <div>
               <p class="panel-kicker">Источники</p>
-              <h2>UTM source</h2>
+              <h2>UTM-источники</h2>
             </div>
           </div>
           <div id="sourcesTable" class="table-list"></div>
@@ -81,3 +102,4 @@
     </div>
   </body>
 </html>
+
