@@ -11,6 +11,7 @@
 - API для Vercel: [api/dashboard.py](/C:/Users/theba/Documents/New%20project/api/dashboard.py), [api/cron_notify.py](/C:/Users/theba/Documents/New%20project/api/cron_notify.py)
 - SQL-схема Supabase: [sql/001_create_orders_table.sql](/C:/Users/theba/Documents/New%20project/sql/001_create_orders_table.sql)
 - ENV-шаблон: [.env.example](/C:/Users/theba/Documents/New%20project/.env.example)
+- Выполнено с помощью CODEX и интеграции с VERCEL и SUPABASE.
 
 ## Архитектура
 
