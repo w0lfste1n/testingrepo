@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GBC Orders Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js" defer></script>
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">RetailCRM → Supabase → Vercel</p>
+          <h1>Mini-dashboard заказов</h1>
+          <p class="hero-copy">
+            Данные синхронизируются из RetailCRM в Supabase, а витрина и cron-уведомления работают на Vercel.
+          </p>
+        </div>
+        <div class="hero-badge">
+          <span>Large order alert</span>
+          <strong id="thresholdValue">50 000 ₸</strong>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="stats-grid" id="statsGrid">
+          <article class="stat-card">
+            <span>Заказы</span>
+            <strong id="totalOrders">...</strong>
+          </article>
+          <article class="stat-card">
+            <span>Выручка</span>
+            <strong id="totalRevenue">...</strong>
+          </article>
+          <article class="stat-card">
+            <span>Средний чек</span>
+            <strong id="avgOrderValue">...</strong>
+          </article>
+          <article class="stat-card accent">
+            <span>Крупные заказы</span>
+            <strong id="largeOrders">...</strong>
+          </article>
+        </section>
+
+        <section class="panel chart-panel">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Динамика</p>
+              <h2>Заказы по дням</h2>
+            </div>
+            <p class="panel-note" id="generatedAt">Обновление...</p>
+          </div>
+          <canvas id="ordersChart" height="110"></canvas>
+        </section>
+
+        <section class="panel table-panel">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Города</p>
+              <h2>Топ по выручке</h2>
+            </div>
+          </div>
+          <div id="citiesTable" class="table-list"></div>
+        </section>
+
+        <section class="panel table-panel">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Источники</p>
+              <h2>UTM source</h2>
+            </div>
+          </div>
+          <div id="sourcesTable" class="table-list"></div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
