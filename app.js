@@ -11,6 +11,11 @@ function renderStat(id, value) {
   document.getElementById(id).textContent = value;
 }
 
+function renderBarWidth(value, maxValue) {
+  if (!maxValue) return 0;
+  return Math.max(8, Math.round((value / maxValue) * 100));
+}
+
 function renderTable(targetId, rows, labelKey) {
   const target = document.getElementById(targetId);
   if (!rows.length) {
@@ -18,15 +23,21 @@ function renderTable(targetId, rows, labelKey) {
     return;
   }
 
+  const maxRevenue = Math.max(...rows.map((row) => row.revenue), 0);
+
   target.innerHTML = rows
     .slice(0, 6)
     .map(
       (row) => `
         <div class="table-row">
-          <div>
-            <strong>${row[labelKey]}</strong>
+          <div class="table-copy">
+            <strong title="${row[labelKey]}">${row[labelKey]}</strong>
+            <span>${integer.format(Math.round(row.revenue))} ₸</span>
+            <div class="table-bar">
+              <div class="table-bar-fill" style="width: ${renderBarWidth(row.revenue, maxRevenue)}%"></div>
+            </div>
           </div>
-          <span>${currency.format(row.revenue)}</span>
+          <div class="table-value">${currency.format(row.revenue)}</div>
         </div>
       `,
     )
@@ -46,17 +57,18 @@ function renderChart(daily) {
           type: "bar",
           label: "Заказы",
           data: daily.map((item) => item.orders),
-          borderRadius: 12,
-          backgroundColor: "#b85c38",
+          borderRadius: 10,
+          backgroundColor: "#8ca6ff",
           yAxisID: "y",
+          maxBarThickness: 28,
         },
         {
           type: "line",
           label: "Выручка",
           data: daily.map((item) => item.revenue),
-          borderColor: "#0d6b5f",
-          backgroundColor: "rgba(13,107,95,0.18)",
-          tension: 0.35,
+          borderColor: "#5f82ff",
+          backgroundColor: "rgba(95,130,255,0.12)",
+          tension: 0.32,
           fill: true,
           yAxisID: "y1",
         },
@@ -67,11 +79,32 @@ function renderChart(daily) {
       interaction: { mode: "index", intersect: false },
       plugins: {
         legend: { position: "bottom" },
+        tooltip: {
+          callbacks: {
+            label(context) {
+              if (context.dataset.label === "Выручка") {
+                return `Выручка: ${currency.format(context.parsed.y)}`;
+              }
+              return `Заказы: ${integer.format(context.parsed.y)}`;
+            },
+          },
+        },
       },
       scales: {
+        x: {
+          ticks: {
+            maxRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 8,
+          },
+          grid: { display: false },
+        },
         y: {
           beginAtZero: true,
-          grid: { color: "rgba(30, 26, 23, 0.08)" },
+          grid: { color: "rgba(122, 135, 148, 0.12)" },
+          ticks: {
+            precision: 0,
+          },
         },
         y1: {
           beginAtZero: true,
